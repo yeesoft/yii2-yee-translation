@@ -79,7 +79,7 @@ class SourceController extends BaseController
             // print_r($model);die;
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('crudMessage', 'Your item has been updated.');
+                Yii::$app->session->setFlash('crudMessage', Yii::t('yee', 'Your item has been updated.'));
                 return $this->redirect($this->getRedirectPage('update', $model));
             }
         }
