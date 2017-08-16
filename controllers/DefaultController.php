@@ -2,7 +2,7 @@
 
 namespace yeesoft\translation\controllers;
 
-use yeesoft\controllers\admin\BaseController;
+use yeesoft\controllers\CrudController;
 use yeesoft\models\User;
 use yeesoft\translation\models\Message;
 use yeesoft\translation\models\MessageSource;
@@ -12,7 +12,7 @@ use yii\base\Model;
 /**
  * MessageController implements the CRUD actions for yeesoft\translation\models\Message model.
  */
-class DefaultController extends BaseController
+class DefaultController extends CrudController
 {
     public $modelClass = 'yeesoft\translation\models\Message';
     public $enableOnlyActions = ['index'];

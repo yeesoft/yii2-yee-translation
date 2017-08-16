@@ -2,7 +2,7 @@
 
 namespace yeesoft\translation\controllers;
 
-use yeesoft\controllers\admin\BaseController;
+use yeesoft\controllers\CrudController;
 use yeesoft\models\User;
 use Yii;
 use yii\web\ForbiddenHttpException;
@@ -10,7 +10,7 @@ use yii\web\ForbiddenHttpException;
 /**
  * SourceController implements the CRUD actions for yeesoft\translation\models\MessageSource model.
  */
-class SourceController extends BaseController
+class SourceController extends CrudController
 {
     public $modelClass = 'yeesoft\translation\models\MessageSource';
     public $enableOnlyActions = ['update', 'create', 'delete'];
