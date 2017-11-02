@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m150320_102452_init_translations extends Migration
+class m150320_102452_message_table extends Migration
 {
     const MESSAGE_TABLE = '{{%message}}';
     const MESSAGE_SOURCE_TABLE = '{{%message_source}}';
@@ -17,9 +17,10 @@ class m150320_102452_init_translations extends Migration
         $this->createTable(self::MESSAGE_SOURCE_TABLE, [
             'id' => $this->primaryKey(),
             'category' => $this->string(32)->notNull(),
-            'message' => $this->text(),
+            'message' => $this->string(255),
             'immutable' => $this->integer(1)->defaultValue(0),
         ], $tableOptions);
+         $this->createIndex('unique_message_idx', self::MESSAGE_SOURCE_TABLE, ['category', 'message'], true);
 
         $this->createTable(self::MESSAGE_TABLE, [
             'id' => $this->primaryKey(),

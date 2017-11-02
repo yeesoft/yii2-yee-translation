@@ -25,7 +25,7 @@ class DefaultController extends CrudController
     {
         $sourceLanguage = 'en-US';
 
-        $languages = Yii::$app->yee->languages;
+        $languages = Yii::$app->languages;
         $categories = MessageSource::getMessageCategories();
 
         unset($languages[$sourceLanguage]);
@@ -58,7 +58,7 @@ class DefaultController extends CrudController
             $messages = [];
         }
 
-        if (User::hasPermission('updateTranslations') && Message::loadMultiple($messages, Yii::$app->request->post())
+        if (User::hasPermission('update-translations') && Message::loadMultiple($messages, Yii::$app->request->post())
             && Model::validateMultiple($messages)
         ) {
             foreach ($messages as $message) {
