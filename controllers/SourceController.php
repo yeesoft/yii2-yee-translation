@@ -2,16 +2,15 @@
 
 namespace yeesoft\translation\controllers;
 
-use yeesoft\controllers\CrudController;
-use yeesoft\models\User;
 use Yii;
-use yii\web\ForbiddenHttpException;
+use yeesoft\controllers\CrudController;
 
 /**
  * SourceController implements the CRUD actions for yeesoft\translation\models\MessageSource model.
  */
 class SourceController extends CrudController
 {
+
     public $modelClass = 'yeesoft\translation\models\MessageSource';
     public $enableOnlyActions = ['update', 'create', 'delete'];
 
@@ -25,7 +24,7 @@ class SourceController extends CrudController
                 return ['update', 'id' => $model->id];
                 break;
             case 'delete':
-                return ['/translation/default/index'];
+                return ['default/index'];
                 break;
             default:
                 return parent::getRedirectPage($action, $model);
@@ -67,16 +66,10 @@ class SourceController extends CrudController
     {
         $model = $this->findModel($id);
 
-        if ($model->immutable && !User::hasPermission('updateImmutableSourceMessages')) {
-            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
-        }
-
         if ($model->load(Yii::$app->request->post())) {
             if (!$model->category) {
                 $model->category = Yii::$app->request->post('category');
             }
-
-            // print_r($model);die;
 
             if ($model->save()) {
                 Yii::$app->session->setFlash('success', 'Your item has been updated.');
@@ -86,25 +79,4 @@ class SourceController extends CrudController
         return $this->renderIsAjax('update', compact('model'));
     }
 
-    /**
-     * Deletes an existing model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     *
-     * @param integer $id
-     *
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->immutable && !User::hasPermission('updateImmutableSourceMessages')) {
-            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
-        }
-
-        $model->delete();
-
-        Yii::$app->session->setFlash('success', 'Your item has been deleted.');
-        return $this->redirect($this->getRedirectPage('delete', $model));
-    }
 }

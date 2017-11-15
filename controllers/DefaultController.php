@@ -2,18 +2,19 @@
 
 namespace yeesoft\translation\controllers;
 
-use yeesoft\controllers\CrudController;
-use yeesoft\models\User;
-use yeesoft\translation\models\Message;
-use yeesoft\translation\models\MessageSource;
 use Yii;
 use yii\base\Model;
+use yii\db\Expression;
+use yeesoft\controllers\CrudController;
+use yeesoft\translation\models\Message;
+use yeesoft\translation\models\MessageSource;
 
 /**
  * MessageController implements the CRUD actions for yeesoft\translation\models\Message model.
  */
 class DefaultController extends CrudController
 {
+
     public $modelClass = 'yeesoft\translation\models\Message';
     public $enableOnlyActions = ['index'];
 
@@ -23,44 +24,43 @@ class DefaultController extends CrudController
      */
     public function actionIndex()
     {
-        $sourceLanguage = 'en-US';
+        $sourceLanguage = Yii::$app->sourceLanguage;
 
         $languages = Yii::$app->languages;
         $categories = MessageSource::getMessageCategories();
 
-        unset($languages[$sourceLanguage]);
-
-        $currentLanguage = Yii::$app->getRequest()->get('translation', NULL);
-        $currentCategory = Yii::$app->getRequest()->get('category', NULL);
+        $currentLanguage = Yii::$app->getRequest()->get('translation', $sourceLanguage);
+        $currentCategory = Yii::$app->getRequest()->get('category', empty($categories) ? null : array_keys($categories)[0]);
 
         if (!in_array($currentLanguage, array_keys($languages))) {
-            $currentLanguage = NULL;
+            $currentLanguage = null;
         }
 
         if (!in_array($currentCategory, array_keys($categories))) {
-            $currentCategory = NULL;
+            $currentCategory = null;
         }
 
         if ($currentLanguage && $currentCategory) {
+            if ($currentLanguage === $sourceLanguage) {
 
-            Message::initMessages($currentCategory, $currentLanguage);
+                $messages = MessageSource::getMessagesByCategory($currentCategory);
+            } else {
 
-            $messageIds = MessageSource::getMessageIdsByCategory($currentCategory);
-            $sourceTable = MessageSource::tableName();
-            $messageTable = Message::tableName();
+                Message::initMessages($currentCategory, $currentLanguage);
 
-            $messages = Message::find()
-                ->andWhere(['IN', 'source_id', $messageIds])
-                ->andWhere(['language' => $currentLanguage])
-                ->indexBy('id')
-                ->all();
+                $sourceMessages = MessageSource::getMessagesByCategory($currentCategory);
+                $orderBy = new Expression('FIELD (id, ' . implode(', ', array_keys($sourceMessages)) . ')');
+
+                $messages = Message::find()
+                                ->andWhere(['in', 'source_id', array_keys($sourceMessages)])
+                                ->andWhere(['language' => $currentLanguage])
+                                ->orderBy($orderBy)->indexBy('id')->all();
+            }
         } else {
             $messages = [];
         }
 
-        if (User::hasPermission('update-translations') && Message::loadMultiple($messages, Yii::$app->request->post())
-            && Model::validateMultiple($messages)
-        ) {
+        if (Yii::$app->user->can('update-translations') && Message::loadMultiple($messages, Yii::$app->request->post()) && Model::validateMultiple($messages)) {
             foreach ($messages as $message) {
                 $message->save(false);
             }
@@ -69,12 +69,7 @@ class DefaultController extends CrudController
             return $this->refresh();
         }
 
-        return $this->render('index', [
-            'messages' => $messages,
-            'languages' => $languages,
-            'categories' => $categories,
-            'currentLanguage' => $currentLanguage,
-            'currentCategory' => $currentCategory,
-        ]);
+        return $this->render('index', compact('messages', 'languages', 'categories', 'sourceLanguage', 'currentLanguage', 'currentCategory'));
     }
+
 }

@@ -1,15 +1,11 @@
 <?php
 
-use yii\helpers\Html;
-
 /* @var $this yii\web\View */
 /* @var $model yeesoft\translation\models\MessageSource */
 
-$this->title = Yii::t('yee/translation', 'Update Message Source');
+$this->title = Yii::t('yee', 'Update "{item}"', ['item' => $model->message]);
 $this->params['breadcrumbs'][] = ['label' => Yii::t('yee/translation', 'Message Translation'), 'url' => ['/translation/default/index']];
-$this->params['breadcrumbs'][] = 'Update Message Source';
+$this->params['breadcrumbs'][] = Yii::t('yee/translation', 'Update Message Source');
 ?>
-<div class="message-source-update">
-    <h3 class="lte-hide-title"><?= Html::encode($this->title) ?></h3>
-    <?= $this->render('_form', compact('model')) ?>
-</div>
+
+<?= $this->render('_form', compact('model')) ?>

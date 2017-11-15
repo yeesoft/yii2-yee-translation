@@ -16,6 +16,7 @@ use Yii;
  */
 class Message extends \yeesoft\db\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -50,23 +51,19 @@ class Message extends \yeesoft\db\ActiveRecord
      */
     public static function initMessages($category, $language)
     {
-        $messageIds = MessageSource::getMessageIdsByCategory($category);
+        $sources = MessageSource::getMessagesByCategory($category);
 
         $translations = Message::find()
-            ->select('source_id')
-            ->andWhere(['IN', 'source_id', $messageIds])
-            ->andWhere(['language' => $language])
-            ->all();
+                ->andWhere(['in', 'source_id', array_keys($sources)])
+                ->andWhere(['language' => $language])
+                ->select('source_id')
+                ->column();
 
-        $translationIds = array_map(function ($translation) {
-            return $translation->source_id;
-        }, $translations);
+        $messagesToCreate = array_diff(array_keys($sources), $translations);
 
-        $translationsToCreate = array_diff($messageIds, $translationIds);
-
-        foreach ($translationsToCreate as $translationId) {
+        foreach ($messagesToCreate as $sourceId) {
             $message = new Message();
-            $message->source_id = $translationId;
+            $message->source_id = $sourceId;
             $message->language = $language;
             $message->translation = '';
             $message->save();
@@ -74,4 +71,5 @@ class Message extends \yeesoft\db\ActiveRecord
 
         return true;
     }
+
 }

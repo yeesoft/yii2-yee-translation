@@ -6,7 +6,6 @@ return [
         'Category',
         'Create Message Source',
         'Create New Category',
-        'Immutable',
         'Message Translation',
         'New Category Name',
         'Please, select message group and language to view translations...',

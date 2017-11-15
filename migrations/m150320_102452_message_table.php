@@ -18,7 +18,6 @@ class m150320_102452_message_table extends Migration
             'id' => $this->primaryKey(),
             'category' => $this->string(32)->notNull(),
             'message' => $this->string(255),
-            'immutable' => $this->integer(1)->defaultValue(0),
         ], $tableOptions);
          $this->createIndex('unique_message_idx', self::MESSAGE_SOURCE_TABLE, ['category', 'message'], true);
 
